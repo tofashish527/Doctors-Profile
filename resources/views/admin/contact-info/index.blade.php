@@ -21,7 +21,12 @@
     .table th {
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.85rem;
+        font-size: 16px;
+        letter-spacing: 0.5px;
+    }
+    .table td {
+        font-weight: 600;
+        font-size: 16px;
         letter-spacing: 0.5px;
     }
     .action-buttons .btn {
@@ -62,7 +67,7 @@
                     <table class="table table-hover align-middle">
                         <thead class="bg-light text-secondary">
                             <tr>
-                                <th scope="col" width="5%">ID</th>
+                                {{-- <th scope="col" width="5%">ID</th> --}}
                                 <th scope="col" width="25%">Address</th>
                                 <th scope="col" width="15%">Phone</th>
                                 <th scope="col" width="25%">Working Days</th>
@@ -73,7 +78,7 @@
                         <tbody>
                             @forelse($contactInfos as $info)
                             <tr>
-                                <td><span class="fw-bold text-secondary">#{{ $info->id }}</span></td>
+                                {{-- <td><span class="fw-bold text-secondary">#{{ $info->id }}</span></td> --}}
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <i class="bi bi-geo-alt text-danger me-2"></i>

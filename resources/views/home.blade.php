@@ -4,6 +4,9 @@
 
 @section('content')
 
+@php
+    $settings = App\Models\SiteSetting::getSettings();
+@endphp
     <!-- Hero Banner Section -->
     <section class="hero-banner">
         <div class="container">
@@ -17,9 +20,9 @@
                             <img src="{{ $banner->doctor_image ? asset('storage/' . $banner->doctor_image) : 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }}" 
                                  alt="{{ $banner->doctor_name }}" 
                                  class="doctor-image">
-                            <div class="experience-badge">
+                            {{-- <div class="experience-badge">
                                 <i class="fas fa-award"></i> 10+ Years Experience
-                            </div>
+                            </div> --}}
                         </div>
                         <div class="doctor-info">
                             <h1 class="doctor-name">{{ $banner->doctor_name }}</h1>
@@ -36,19 +39,24 @@
                     </div>
                     
                     <!-- Action Buttons -->
-                    <div class="action-buttons animate-fade-in-up animate-delay-1">
-                        <a href="{{ route('contact') }}" class="btn-appointment">
-                            <i class="fas fa-calendar-check"></i> Book Appointment
-                        </a>
-            
-                    {{-- WATCH VIDEO BUTTON (FIXED) --}}
-                    {{-- @if($banner->video_enabled) --}}
+          <div class="action-buttons animate-fade-in-up animate-delay-1">
+    <a href="{{ route('contact') }}" class="btn-appointment same-btn">
+        <i class="fas fa-calendar-check"></i>
+        <span>Book Appointment</span>
+    </a>
 
-                    <button type="button" class="mt-2 w-36 action-buttons btn-appointment animate-fade-in-up animate-delay-1" onclick="openVideoModal()">
-                        <i class="fas fa-play-circle"></i> Watch Video
-                    </button>
-                    {{-- @endif --}}
-                    </div>
+    @if($banner->video_enabled)
+    <button type="button"
+        class="btn-appointment same-btn mt-2"
+        onclick="openVideoModal()">
+        <i class="fas fa-play-circle"></i>
+        <span>Watch Video</span>
+    </button>
+@endif
+
+</div>
+
+
                 </div>
                 
                 <!-- Right Column - Contact & Hours -->
@@ -59,10 +67,10 @@
                             <i class="fas fa-phone-alt"></i>
                         </div>
                         <h5>Emergency Contact</h5>
-                        <p class="mb-3">24/7 Emergency Medical Services Available</p>
+                        <p class="mb-3 text-white">24/7 Emergency Medical Services Available</p>
                         <div class="emergency-phone">
-                            <a href="tel:{{ $contactInfo->phone_number ?? '+880101234567' }}">
-                                {{ $contactInfo->phone_number ?? '+880 1012 34567' }}
+                            <a href="tel:{{ $settings->emergency_phone }}">
+                              {{ $settings->emergency_phone }}
                             </a>
                         </div>
                     </div>
@@ -81,7 +89,7 @@
             <i class="fas fa-map-marker-alt me-1"></i> Multiple Locations Available
         </p>
         
-        <div class="location-carousel">
+        <div class="location-carousel" id="locationCarousel">
             <!-- Location Info Slides -->
             <div class="location-slides">
                 @foreach($contactInfos as $index => $info)
@@ -104,7 +112,7 @@
                             @endforeach
                         @else
                             <li class="text-muted">
-                                <span colspan="2">No schedule available</span>
+                                <span>No schedule available</span>
                             </li>
                         @endif
                     </ul>
@@ -116,7 +124,6 @@
             <div class="carousel-pagination">
                 @foreach($contactInfos as $index => $info)
                 <button class="pagination-dot {{ $index === 0 ? 'active' : '' }}" 
-                        onclick="changeLocation({{ $index }})"
                         data-slide="{{ $index }}">
                     {{ $index + 1 }}
                 </button>
@@ -124,16 +131,14 @@
             </div>
             
             <!-- Navigation Arrows -->
-            @if($contactInfos->count() > 1)
             <div class="carousel-nav">
-                <button class="nav-btn prev-btn" onclick="prevLocation()">
+                <button class="nav-btn prev-btn">
                     <i class="fas fa-chevron-left"></i>
                 </button>
-                <button class="nav-btn next-btn" onclick="nextLocation()">
+                <button class="nav-btn next-btn">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-            @endif
         </div>
         
     @elseif($contactInfo)
@@ -174,7 +179,6 @@
     <!-- Doctor Details Section -->
     <section class="doctor-details-section">
         <div class="container">
-            <--Professional-->
             <div class="professional-info animate-fade-in-up">
     <table class="info-table">
         <tbody>
@@ -263,7 +267,7 @@
 </div>
 @endif
             
-            <!-- Awards Section -->
+            {{-- <!-- Awards Section -->
             <div class="awards-section animate-fade-in-up animate-delay-2">
                 <h3 class="section-heading">Awards & Recognition</h3>
                 <div class="awards-grid">
@@ -304,7 +308,26 @@
                         </div>
                     </div>
                 </div>
+            </div> --}}
+            <!-- Awards Section -->
+@if($banner->awards && $banner->awards->count() > 0)
+<div class="awards-section animate-fade-in-up animate-delay-2">
+    <h3 class="section-heading">Awards & Recognition</h3>
+    <div class="awards-grid">
+        @foreach($banner->awards as $award)
+        <div class="award-card">
+            <div class="award-icon">
+                <i class="{{ $award->icon }}"></i>
             </div>
+            <div class="award-content">
+                <h5>{{ $award->title }}</h5>
+                <p>{{ $award->organization }}, {{ $award->year }}</p>
+            </div>
+        </div>
+        @endforeach
+    </div>
+</div>
+@endif
         </div>
     </section>
 
@@ -320,7 +343,93 @@
     </div>
 </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Location Carousel initialization
+    const carousel = document.getElementById('locationCarousel');
     
+    if (carousel) {
+        let currentSlide = 0;
+        const slides = carousel.querySelectorAll('.location-slide');
+        const dots = carousel.querySelectorAll('.pagination-dot');
+        const prevBtn = carousel.querySelector('.prev-btn');
+        const nextBtn = carousel.querySelector('.next-btn');
+        const totalSlides = slides.length;
+        
+        console.log('Carousel initialized with', totalSlides, 'slides');
+        
+        // Function to show specific slide
+        function showSlide(index) {
+            // Hide all slides
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+            });
+            
+            // Remove active from all dots
+            dots.forEach(dot => {
+                dot.classList.remove('active');
+            });
+            
+            // Show current slide
+            if (slides[index]) {
+                slides[index].classList.add('active');
+            }
+            
+            // Activate current dot
+            if (dots[index]) {
+                dots[index].classList.add('active');
+            }
+            
+            currentSlide = index;
+            console.log('Showing slide:', index);
+        }
+        
+        // Next slide function
+        function nextSlide() {
+            const next = (currentSlide + 1) % totalSlides;
+            showSlide(next);
+        }
+        
+        // Previous slide function
+        function prevSlide() {
+            const prev = (currentSlide - 1 + totalSlides) % totalSlides;
+            showSlide(prev);
+        }
+        
+        // Event listeners for navigation buttons
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                prevSlide();
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                nextSlide();
+            });
+        }
+        
+        // Event listeners for pagination dots
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', function(e) {
+                e.preventDefault();
+                showSlide(index);
+            });
+        });
+        
+        // Optional: Auto-rotate every 5 seconds
+        // Uncomment if you want automatic rotation
+       
+        setInterval(function() {
+            nextSlide();
+        }, 5000);
+       
+    }
+});
+</script>
+
     <script>
      // Video Modal Functions - Fixed Version
 function openVideoModal() {
@@ -424,51 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
-        // Location Carousel Functions
-let currentSlide = 0;
-const totalSlides = {{ $contactInfos->count() }};
-
-function changeLocation(slideIndex) {
-    // Hide all slides
-    const slides = document.querySelectorAll('.location-slide');
-    const dots = document.querySelectorAll('.pagination-dot');
-    
-    slides.forEach((slide, index) => {
-        if (index === slideIndex) {
-            slide.classList.add('active');
-        } else {
-            slide.classList.remove('active');
-        }
-    });
-    
-    dots.forEach((dot, index) => {
-        if (index === slideIndex) {
-            dot.classList.add('active');
-        } else {
-            dot.classList.remove('active');
-        }
-    });
-    
-    currentSlide = slideIndex;
-}
-
-function nextLocation() {
-    const nextSlide = (currentSlide + 1) % totalSlides;
-    changeLocation(nextSlide);
-}
-
-function prevLocation() {
-    const prevSlide = (currentSlide - 1 + totalSlides) % totalSlides;
-    changeLocation(prevSlide);
-}
-
-// Auto-rotate locations (optional - every 5 seconds)
-// Uncomment if you want auto-rotation
-// setInterval(() => {
-//     if (totalSlides > 1) {
-//         nextLocation();
-//     }
-// }, 5000);
+   
         
         // Initialize animations and effects
         document.addEventListener('DOMContentLoaded', function() {
@@ -526,6 +591,61 @@ function prevLocation() {
                 radial-gradient(circle at 80% 20%, rgba(26, 95, 122, 0.2) 0%, transparent 50%);
             z-index: 1;
         }
+
+        .doctor-left-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;   /* center horizontally */
+}
+
+/* Doctor Card */
+.doctor-card {
+    width: 100%;
+    max-width: 620px;      /* card size control */
+    text-align: center;
+}
+
+/* Doctor Image */
+.doctor-image-container {
+    display: flex;
+    justify-content: center;
+    padding:5px
+}
+
+.doctor-image {
+    width: 100%;
+    max-width: 480px;
+    border-radius: 12px;
+}
+
+/* Doctor Info */
+.doctor-info {
+    padding: 20px;
+}
+
+/* Social Icons */
+.doctor-social {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.action-buttons .same-btn {
+    width: 100%;
+    justify-content: center;
+}
+
         
         /* Main Content Container */
         .main-container {
@@ -1183,6 +1303,77 @@ function prevLocation() {
     border-bottom: none;
 }
 
+/* Location Carousel Styles */
+.location-carousel {
+    position: relative;
+    margin-top: 20px;
+}
+
+.location-slides {
+    position: relative;
+    min-height: 300px;
+}
+
+.location-slide {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.location-slide.active {
+    display: block;
+    opacity: 1;
+    animation: slideIn 0.5s ease;
+}
+
+.location-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+}
+
+.location-phone {
+    padding: 8px 15px;
+    background: rgba(26, 95, 122, 0.05);
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.location-phone a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.location-phone a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+.working-hours-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.working-hours-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(26, 95, 122, 0.1);
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.working-hours-list li:last-child {
+    border-bottom: none;
+}
+
 /* Carousel Pagination */
 .carousel-pagination {
     display: flex;
@@ -1226,6 +1417,7 @@ function prevLocation() {
     display: flex;
     justify-content: space-between;
     margin-top: 15px;
+    gap: 10px;
 }
 
 .nav-btn {
@@ -1247,6 +1439,11 @@ function prevLocation() {
     background: var(--primary-color);
     color: white;
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(26, 95, 122, 0.3);
+}
+
+.nav-btn:active {
+    transform: scale(0.95);
 }
 
 /* Slide Animation */
@@ -1268,6 +1465,10 @@ function prevLocation() {
         padding: 10px 15px;
     }
     
+    .location-phone {
+        font-size: 0.85rem;
+    }
+    
     .pagination-dot {
         width: 32px;
         height: 32px;
@@ -1278,22 +1479,31 @@ function prevLocation() {
         width: 36px;
         height: 36px;
     }
+    
+    .working-hours-list li {
+        font-size: 0.85rem;
+    }
 }
 
 @media (max-width: 576px) {
+    .location-slides {
+        min-height: 280px;
+    }
+    
     .carousel-nav {
-        position: absolute;
-        width: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        padding: 0 10px;
-        pointer-events: none;
+        position: relative;
+        margin-top: 10px;
     }
     
     .nav-btn {
-        pointer-events: all;
         background: rgba(255, 255, 255, 0.95);
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .location-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
     }
 }
         
@@ -1453,5 +1663,18 @@ function prevLocation() {
         .animate-delay-2 {
             animation-delay: 0.4s;
         }
+
+        .same-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+
+    height: 48px;        /* force same height */
+    min-width: 180px;    /* force same width */
+
+    padding: 0 20px;
+}
+
     </style>
 @endpush

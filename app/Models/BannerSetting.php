@@ -56,4 +56,8 @@ class BannerSetting extends Model
     {
         return $this->intro_video && $this->video_enabled;
     }
+    public function awards()
+{
+    return $this->hasMany(DoctorAward::class)->orderBy('rank');
+}
 }

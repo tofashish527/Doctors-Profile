@@ -1,9 +1,9 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="content-wrapper">
+<div class="content-wrapper pt-70">
     <div class="page-header">
-        <h1><i class="icon-user me-2"></i>Doctor Profile Settings</h1>
+        <h3><i class="icon-user me-2"></i>Doctor Profile Settings</h3>
         <nav aria-label="breadcrumb" class="mt-3">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
@@ -244,7 +244,7 @@
 
             <!-- Education & Experience Row -->
             <div class="row">
-                <!-- Education Card -->
+                {{-- <!-- Education Card -->
                 <div class="col-md-6 mb-4">
                     <div class="card h-100" style="border: none; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
                         <div class="card-header" style="background: linear-gradient(135deg, #3498db, #2980b9); 
@@ -412,7 +412,22 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> --}}
+                    <!-- Education Card -->
+    <div class="col-md-6 mb-4">
+        @include('admin.banner.partials.education-section')
+    </div>
+
+    <!-- Experience Card -->
+    <div class="col-md-6 mb-4">
+        @include('admin.banner.partials.experience-section')
+    </div>
+
+    <!-- Add after Experience section -->
+<div class="col-md-12 mb-4">
+    @include('admin.banner.partials.awards-section')
+</div>
+
             </div>
         </div>
 

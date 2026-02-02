@@ -102,7 +102,7 @@
                 <div class="col-12">
                     <div class="footer-copyright">
                         <div class="copyright">
-                            <span>&copy; {{ date('Y') }} medisch by <a href="https://1.envato.market/kP9BV"> Zytheme.com</a>. all rights reserved.</span>
+                            <span>&copy; {{ date('Y') }} medisch by <a href="https://1.envato.market/kP9BV"> InnovaTech</a>. all rights reserved.</span>
                             <ul class="list-unstyled social-icons">
                                 <li> <a class="share-facebook" href="#"><i class="fab fa-facebook-f"> </i></a></li>
                                 <li> <a class="share-instagram" href="#"><i class="fab fa-instagram"></i></a></li>

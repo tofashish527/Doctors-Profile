@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Ecommerce Dashboard</title>
+    <title>Profile Dashboard</title>
     <meta name="author" content="themesflat.com">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
@@ -25,6 +25,55 @@
     <link rel="apple-touch-icon-precomposed" href="{{ asset('assets2/images/favicon.png') }}">
 
     <style>
+        /* ================= Fix Main Content Layout ================= */
+#page-content-wrapper {
+    padding: 60px 30px !important;
+    min-height: calc(100vh - 80px) !important;
+    background: #f8f9fa !important;
+    margin-left: 260px !important;
+    width: calc(100% - 260px) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* When sidebar is collapsed */
+.layout-wrap.sidebar-collapse #page-content-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+}
+
+/* Main content area */
+.main-content {
+    background: white !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+    min-height: 80vh !important;
+    padding: 25px !important;
+    width: 100% !important;
+    display: block !important;
+}
+
+.content-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Responsive */
+@media only screen and (max-width: 991px) {
+    #page-content-wrapper {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 35px !important;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .main-content {
+        padding: 35px !important;
+    }
+}
+        
         .unread-count {
             display: none;
         }
@@ -177,17 +226,21 @@
                             <div class="center-heading">All page</div>
                             <ul class="menu-list">
                                 <li class="menu-item">
-                                    <a href="" class="">
+                                    <a class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}" 
+       href="{{ route('admin.settings.index') }}">
                                         <div class="icon"><i class="icon-dollar-sign"></i></div>
-                                        <div class="text">Currency Settings</div>
+                                        <div class="text">Settings</div>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-    <a class="nav-link {{ request()->routeIs('admin.banner.*') ? 'active' : '' }}" 
+
+                                 <li class="menu-item">
+                                    <a class="nav-link {{ request()->routeIs('admin.banner.*') ? 'active' : '' }}" 
        href="{{ route('admin.banner.index') }}">
-        <i class="bi bi-person-badge"></i> Doctor Profile
-    </a>
-</li>
+                                        <div class="icon"><i class="icon-dollar-sign"></i></div>
+                                        <div class="text">Doctor Profile</div>
+                                    </a>
+                                </li>
+               
                                 {{-- <li class="nav-item dropdown">
     <a class="nav-link dropdown-toggle" href="#" id="contactDropdown"
        role="button" data-bs-toggle="dropdown" aria-expanded="false">

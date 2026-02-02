@@ -10,7 +10,7 @@ class HomeController extends Controller
 {
   public function index()
     {
-        $banner = BannerSetting::with(['educations', 'experiences'])->first();
+        $banner = BannerSetting::with(['educations', 'experiences','awards'])->first();
         
         // Get ALL active contact infos
         $contactInfos = ContactInfo::where('is_active', true)->get();

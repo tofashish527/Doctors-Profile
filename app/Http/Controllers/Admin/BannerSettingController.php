@@ -7,6 +7,7 @@ use App\Models\BannerSetting;
 use App\Models\DoctorEducation;
 use App\Models\DoctorExperience;
 use App\Models\ContactInfo;
+use App\Models\DoctorAward;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -115,6 +116,19 @@ class BannerSettingController extends Controller
         return redirect()->back()->with('success', 'Video deleted successfully!');
     }
 
+    public function educations()
+{
+    $banner = BannerSetting::first();
+    $educations = $banner->educations()->orderBy('display_order')->get();
+    return view('admin.banner.educations', compact('educations'));
+}
+
+public function experiences()
+{
+    $banner = BannerSetting::first();
+    $experiences = $banner->experiences()->orderBy('display_order')->get();
+    return view('admin.banner.experiences', compact('experiences'));
+}
     // Education Methods
     public function storeEducation(Request $request)
     {
@@ -216,4 +230,72 @@ public function updateExpertise(Request $request)
         $experience->delete();
         return redirect()->back()->with('success', 'Experience deleted successfully!');
     }
+
+    // Awards page
+public function awards()
+{
+    $banner = BannerSetting::first();
+    $awards = $banner->awards()->orderBy('rank')->get();
+    
+    // Available icons
+    $icons = [
+        'fas fa-award' => 'Award',
+        'fas fa-medal' => 'Medal',
+        'fas fa-trophy' => 'Trophy',
+        'fas fa-star' => 'Star',
+        'fas fa-certificate' => 'Certificate',
+        'fas fa-ribbon' => 'Ribbon',
+        'fas fa-crown' => 'Crown',
+    ];
+    
+    return view('admin.banner.awards', compact('awards', 'icons'));
+}
+
+// Store award
+public function storeAward(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:200',
+        'organization' => 'required|string|max:200',
+        'year' => 'required|string|max:10',
+        'icon' => 'required|string|max:50',
+        'rank' => 'required|integer|min:1',
+    ]);
+
+    $banner = BannerSetting::first();
+
+    DoctorAward::create([
+        'banner_setting_id' => $banner->id,
+        'title' => $request->title,
+        'organization' => $request->organization,
+        'year' => $request->year,
+        'icon' => $request->icon,
+        'rank' => $request->rank,
+    ]);
+
+    return redirect()->back()->with('success', 'Award added successfully!');
+}
+
+// Update award
+public function updateAward(Request $request, DoctorAward $award)
+{
+    $request->validate([
+        'title' => 'required|string|max:200',
+        'organization' => 'required|string|max:200',
+        'year' => 'required|string|max:10',
+        'icon' => 'required|string|max:50',
+        'rank' => 'required|integer|min:1',
+    ]);
+
+    $award->update($request->only(['title', 'organization', 'year', 'icon', 'rank']));
+
+    return redirect()->back()->with('success', 'Award updated successfully!');
+}
+
+// Delete award
+public function deleteAward(DoctorAward $award)
+{
+    $award->delete();
+    return redirect()->back()->with('success', 'Award deleted successfully!');
+}
 }
