@@ -41,7 +41,7 @@
         {{-- হেডার সেকশন --}}
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2 class="fw-bold text-primary">Contact Info List</h2>
+                <h4 class="fw-bold text-primary">Contact Info List</h4>
                 <p class="text-muted small mb-0">Manage your contact details and working hours</p>
             </div>
             <a href="{{ route('admin.contact-info.create') }}" class="btn btn-primary shadow-sm">
@@ -106,8 +106,8 @@
                                 </td>
                                 <td class="text-center action-buttons">
                                     <a href="{{ route('admin.contact-info.edit', $info) }}" 
-                                       class="btn btn-sm btn-outline-warning" title="Edit">
-                                        <i class="bi bi-pencil-square"></i>
+                                       class="btn btn-sm btn-outline-danger" title="Edit">
+                                        <i class="bi bi-pencil-square">Edit</i>
                                     </a>
                                     
                                     <form action="{{ route('admin.contact-info.destroy', $info) }}" 
@@ -116,7 +116,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-                                            <i class="bi bi-trash"></i>
+                                            <i class="bi bi-trash">Delete</i>
                                         </button>
                                     </form>
                                 </td>

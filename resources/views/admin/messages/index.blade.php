@@ -3,97 +3,109 @@
 @section('title', 'Contact Messages')
 
 @section('content')
-<div class="main-content">
-    <div class="main-content-inner">
 
-        {{-- Header --}}
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-2xl font-semibold">Contact Messages</h3>
-            <ul class="flex items-center gap-2 text-sm text-gray-500">
-                <li><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                <li><span>›</span></li>
-                <li>Messages</li>
-            </ul>
+<div class="container-fluid p-4">
+    {{-- Header --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-primary mb-0">Contact Messages</h2>
+            <p class="text-muted small mb-0">View and manage all incoming messages</p>
+        </div>
+    </div>
+
+    {{-- Success Alert --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 border-start border-success border-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    {{-- Table Card --}}
+    <div class="card shadow border-0 rounded-3">
+        <div class="card-header bg-white py-3">
+            <h6 class="m-0 fw-bold text-primary">Messages List</h6>
         </div>
 
-        {{-- Success Alert --}}
-        @if(session('success'))
-            <div class="alert alert-success mb-4">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        {{-- Table --}}
-        <div class="bg-white shadow rounded-lg overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-lg font-bold">Status</th>
-                        <th class="px-6 py-3 text-left text-lg font-bold">Name</th>
-                        <th class="px-6 py-3 text-left text-lg font-bold">Email</th>
-                        <th class="px-6 py-3 text-left text-lg font-bold">Phone</th>
-                        <th class="px-6 py-3 text-left text-lg font-bold">Location</th>
-                        <th class="px-6 py-3 text-left text-lg font-bold">Date</th>
-                        <th class="px-6 py-3 text-center text-lg font-bold">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    @forelse($messages as $msg)
-                        <tr class="{{ !$msg->is_read ? 'bg-blue-50' : '' }}">
-                            <td class="px-6 py-4">
-                                <span class="px-2 py-1 rounded text-white text-sm {{ !$msg->is_read ? 'bg-blue-500' : 'bg-gray-400' }}">
-                                    {{ !$msg->is_read ? 'New' : 'Read' }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 font-medium">{{ $msg->name }}</td>
-                            <td class="px-6 py-4">{{ $msg->email }}</td>
-                            <td class="px-6 py-4">{{ $msg->phone_number }}</td>
-                            <td class="px-6 py-4">{{ $msg->selected_address }}</td>
-                            <td class="px-6 py-4">{{ $msg->created_at->format('M d, Y') }}</td>
-                            <td class="px-6 py-4 text-center space-x-2">
-                                <a href="{{ route('admin.messages.show', $msg) }}" class="inline-block px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
-                                    View
-                                </a>
-                                <form action="{{ route('admin.messages.destroy', $msg) }}" method="POST" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" onclick="return confirm('Are you sure?')" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-secondary">
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-gray-500">
-                                No messages found
-                            </td>
+                            <th width="8%" class="ps-4">Status</th>
+                            <th width="15%">Name</th>
+                            <th width="20%">Email</th>
+                            <th width="12%">Phone</th>
+                            <th width="20%">Location</th>
+                            <th width="10%">Date</th>
+                            <th width="15%" class="text-center pe-4">Actions</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                    </thead>
 
-        {{-- Pagination --}}
-        <div class="mt-4">
-            {{ $messages->links('pagination::bootstrap-4') }}
-        </div>
+                    <tbody>
+                        @forelse($messages as $msg)
+                            <tr class="{{ !$msg->is_read ? 'table-primary' : '' }}">
+                                <td class="ps-4">
+                                    <span class="badge {{ !$msg->is_read ? 'bg-primary' : 'bg-secondary' }}">
+                                        {{ !$msg->is_read ? 'New' : 'Read' }}
+                                    </span>
+                                </td>
 
+                                <td>{{ $msg->name }}</td>
+
+                                <td class="text-break">
+                                    {{ $msg->email }}
+                                </td>
+
+                                <td>{{ $msg->phone_number }}</td>
+
+                                <td class="text-break">
+                                    {{ Str::limit($msg->selected_address, 40) }}
+                                </td>
+
+                                <td>{{ $msg->created_at->format('M d, Y') }}</td>
+
+                                <td class="text-center pe-4 action-buttons">
+                                    <a href="{{ route('admin.messages.show', $msg) }}"
+                                       class="btn btn-sm btn-outline-success" title="View">
+                                        <i class="bi bi-eye">Read</i>
+                                    </a>
+
+                                    <form action="{{ route('admin.messages.destroy', $msg) }}"
+                                          method="POST" class="d-inline"
+                                          onsubmit="return confirm('Are you sure?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <i class="bi bi-trash">Delete</i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="bi bi-envelope-x display-4 text-muted mb-3"></i>
+                                        <h5 class="text-muted">No Messages Found</h5>
+                                        <p class="text-muted small">All incoming messages will appear here.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            @if($messages->hasPages())
+            <div class="p-3 border-top">
+                {{ $messages->links('pagination::bootstrap-4') }}
+            </div>
+            @endif
+        </div>
     </div>
 </div>
 
-<style>
-    /* ================= Responsive Main Content ================= */
-    .main-content {
-        margin-left: 280px; /* sidebar space */
-        padding: 30px;
-    }
-
-    @media (max-width: 991px) {
-        .main-content {
-            margin-left: 0;
-            padding: 15px;
-        }
-    }
-</style>
 @endsection

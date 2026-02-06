@@ -3,7 +3,7 @@
 @section('content')
 <div class="content-wrapper">
     <div class="page-header">
-        <h1>Add Contact Info</h1>
+        <h4>Add Contact Info</h4>
     </div>
 
     <div class="card" style="border-radius: 10px; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
